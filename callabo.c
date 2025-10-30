@@ -36,9 +36,11 @@ int main()
 }
 void mover(int tablero[][N], int i, int pos_x, int pos_y, int *q)
 {
+    
     int k, u, v;
     k = 0;
     *q = 0;
+    tablero [u][v] = "x";
     do
     {
         u = pos_x + ejex[k];
@@ -50,7 +52,7 @@ void mover(int tablero[][N], int i, int pos_x, int pos_y, int *q)
                 tablero[u][v] = i; /* anota el candidato */
                 if (i < ncuad)
                 { /* llega al final del recorrido? */
-                    mover(tablero, i + 1, u, v, q);
+                    mover(tablero, i, u, v, q);
                     if (!*q)
                         tablero[u][v] = 0; /* borra el candidato */
                 }

@@ -1,11 +1,11 @@
 #include <stdio.h>
 #define FILAS 10
 #define COLUMNAS 10
-int c;
-    const int ejex[4] = {1, 1, -1, -1},
-              ejey[4] = {-1, 1, -1, 1};
+const int ejex[4] = {-1, 1, 0, 0},
+          ejey[4] = {0, 0, -1, 1};
+
 void mostrarLaberinto(char laberinto[FILAS][COLUMNAS]);
-void calcularRutas(int ejeX, int ejeY, char laberinto[FILAS][COLUMNAS], int *);
+int calcularRutas2(char laberinto[FILAS][COLUMNAS], int, int);
 int main(){
     int q;
     char laberinto[FILAS][COLUMNAS] = {
@@ -22,11 +22,11 @@ int main(){
     printf("----- BUSCANDO EL CAMINO DEL LABERINTO RECURSIVO ---\n");
     printf("Buscando el camino desde A hasta B \n");
 
-    calcularRutas(0, 0, laberinto, &q);
-        mostrarLaberinto(laberinto);
-        printf("Cantidad de movimientos realizados: %d\n", c);
+  calcularRutas2(laberinto, 0, 0);
+  mostrarLaberinto(laberinto);
     return 0;
 }
+
 void mostrarLaberinto(char laberinto[FILAS][COLUMNAS])
 {
     for (int i = 0; i < FILAS; i++)
@@ -37,33 +37,38 @@ void mostrarLaberinto(char laberinto[FILAS][COLUMNAS])
         }
         printf("\n");
     }
+    printf("\n\n\n");
 }
-void calcularRutas(int ejeX, int ejeY, char laberinto[FILAS][COLUMNAS], int *q)
-{
-    c++;
-    int k, u, v;
-    k = 0;
-    *q = 0;
-    do
-    {
-        u = ejeX + ejex[k];
-        v = ejeY + ejey[k]; /* seleccionar candidato */
-        if (u >= 0 && u < FILAS && v >= 0 && v < COLUMNAS)
-        { /* esta dentro de los limites? */
-            if (laberinto[u][v] == ' ')
-            {                      /* es valido? */
-                laberinto[u][v] = 'X'; /* anota el candidato */
-                if (u != FILAS - 1 || v != COLUMNAS - 1)
-                { /* llega al final del recorrido? */
-                    calcularRutas(u, v, laberinto, q);
-                    if (!*q)
-                        laberinto[u][v] = ' '; /* borra el candidato */
-                }
-                else
-                    *q = 1; /* hay solucion */
-            }
-        }
-        printf("Intento en la posicion (%d, %d)\n", u, v);
-        k++;
-    } while (!*q && k < 8);
+int calcularRutas2(char laberinto[FILAS][COLUMNAS], int i, int j){
+     // Si está fuera de los límites
+    if (i < 0 || j < 0 || i >= FILAS || j >= COLUMNAS)
+        return 0;
+
+    // Si es una pared o ya visitado
+    if (laberinto[i][j] == '#' || laberinto[i][j] == 'X')
+        return 0;
+
+    // Si encontramos la meta
+    if (laberinto[i][j] == 'B') {
+        printf("Camino encontrado!\n");
+        return 1;
+    }
+
+    // Marcar la posición actual
+    if (laberinto[i][j] != 'A')
+        laberinto[i][j] = 'X';
+    // Probar las 4 direcciones
+    for (int k = 0; k < 4; k++) {
+        int nuevoX = i + ejex[k];
+        int nuevoY = j + ejey[k];
+
+        if(calcularRutas2(laberinto, nuevoX, nuevoY))
+            return 1; // Si encontramos un camino, salimos
+    }
+
+    // Retroceder (backtracking)
+    if (laberinto[i][j] != 'A')
+        laberinto[i][j] = ' ';
+    return 0;
+
 }

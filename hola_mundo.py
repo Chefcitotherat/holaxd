@@ -1,2 +1,0 @@
- # comentario
-print('hola mundo')
