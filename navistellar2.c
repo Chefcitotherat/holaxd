@@ -28,17 +28,17 @@ typedef struct datosGlobales
 // declaramos los prototipos de las funciones que usaremos
 char cambiarDireccion(char direccionActual, char direccionGiro);
 coordenada obtenerNuevaPosicionNave(coordenada posicionActual, char direccionActual);
-int CalcularRuta(FILE *puntero_archivo, FILE *archivoSalida, datosGlobales *datos, char mapa[datos->cantidadFilas][datos->cantidadColumnas], char ordenes[]);
+int CalcularRuta(FILE *puntero_archivo, FILE *archivo_salida, datosGlobales *datos, char mapa[datos->cantidadFilas][datos->cantidadColumnas], char ordenes[]);
 void leerDatos(datosGlobales *datos, FILE *puntero_archivo, char mapa[datos->cantidadFilas][datos->cantidadColumnas]);
-void entregarResultado(int resultado, FILE *archivoSalida);
+void entregarResultado(int resultado, FILE *archivo_salida);
 
 int main()
 {
     // Inicializamos los punteros de archivo
     FILE *puntero_archivo;
-    FILE *archivoSalida;
+    FILE *archivo_salida;
     puntero_archivo = fopen("situacion_inicial.txt", "r");
-    archivoSalida = fopen("situacion_final.txt", "w");
+    archivo_salida = fopen("situacion_final.txt", "w");
 
     // Declaramos una variable de tipo datosGlobales para almacenar toda la información relevante
     datosGlobales datos;
@@ -56,21 +56,17 @@ int main()
     };
 
     leerDatos(&datos, puntero_archivo, mapa);
-    
     char ordenes[datos.cantidadOrdenes];
 
-    int resultado = CalcularRuta(puntero_archivo, archivoSalida, &datos, mapa, ordenes);
-
-    entregarResultado(resultado, archivoSalida);
-    
+    int resultado = CalcularRuta(puntero_archivo, archivo_salida, &datos, mapa, ordenes);
+    entregarResultado(resultado, archivo_salida);
     fclose(puntero_archivo);
-    fclose(archivoSalida);
+    fclose(archivo_salida);
     return 0;
 }
 
 // en esta función se leen todos los datos del archivo txt y se asignan a la struct datos del programa principal
-void leerDatos(datosGlobales *datos, FILE *puntero_archivo, char mapa[datos->cantidadFilas][datos->cantidadColumnas])
-{
+void leerDatos(datosGlobales *datos, FILE *puntero_archivo, char mapa[datos->cantidadFilas][datos->cantidadColumnas]){
 
     fscanf(puntero_archivo, "%d;%d", &datos->posicionNave.X, &datos->posicionNave.Y);
     mapa[datos->posicionNave.X][datos->posicionNave.Y] = 'H';
@@ -174,7 +170,7 @@ coordenada obtenerNuevaPosicionNave(coordenada posicionActual, char direccionAct
 }
 
 // en esta función se calcula la ruta de la nave según las órdenes recibidas
-int CalcularRuta(FILE *puntero_archivo, FILE *archivoSalida, datosGlobales *datos, char mapa[datos->cantidadFilas][datos->cantidadColumnas], char ordenes[datos->cantidadOrdenes])
+int CalcularRuta(FILE *puntero_archivo, FILE *archivo_salida, datosGlobales *datos, char mapa[datos->cantidadFilas][datos->cantidadColumnas], char ordenes[datos->cantidadOrdenes])
 {
     datos->direccionActual = datos->orientacionInicial;
     for (int i = 0; i < datos->cantidadOrdenes; i++)
@@ -202,7 +198,10 @@ int CalcularRuta(FILE *puntero_archivo, FILE *archivoSalida, datosGlobales *dato
         {
             datos->posicionNave = obtenerNuevaPosicionNave(datos->posicionNave, datos->direccionActual);
         }
-        if (datos->posicionNave.X < 0 || datos->posicionNave.Y < 0 || datos->posicionNave.X >= datos->cantidadFilas || datos->posicionNave.Y >= datos->cantidadColumnas){
+        if (datos->posicionNave.X < 0 || datos->posicionNave.Y < 0 ||
+            datos->posicionNave.X >= datos->cantidadFilas ||
+            datos->posicionNave.Y >= datos->cantidadColumnas)
+        {
             return 1;
         }
         if (datos->posicionNave.X == datos->posicionPlaneta.X && datos->posicionNave.Y == datos->posicionPlaneta.Y)
@@ -212,19 +211,19 @@ int CalcularRuta(FILE *puntero_archivo, FILE *archivoSalida, datosGlobales *dato
         };
     }
 }
+
 // en esta función se entrega el resultado final al archivo de salida
-void entregarResultado(int resultado, FILE *archivoSalida)
-{
+void entregarResultado(int resultado, FILE *archivo_salida){
     if (resultado == 0)
     {
-        fprintf(archivoSalida, "Nave destruida.");
+        fprintf(archivo_salida, "Nave destruida.");
     }
     if (resultado == 1)
     {
-        fprintf(archivoSalida, "Nave perdida.");
+        fprintf(archivo_salida, "Nave perdida.");
     }
     if (resultado == 2)
     {
-        fprintf(archivoSalida, "Llegamos a salvo");
+        fprintf(archivo_salida, "Llegamos a salvo");
     }
 }
